@@ -1,16 +1,43 @@
-# note_basket
+# Notes App
 
-A new Flutter application.
+## :dart: About ##
+Bu projede Sqflite kullanılarak kalıcı depolama sayesinde basit bir not uygulaması geliştirdim.
 
-## Getting Started
+Notlar, notlarin içeriği vs. için ilk önce bir veri tabanı oluşturup oluşturduğum veri tabanını uygulama
+import ettikten sonra gerekli veri tabanındaki bilgileri uygulama yansıttım.
 
-This project is a starting point for a Flutter application.
+Kullanıcılar istediği şekilde uygulamaya kategori ekleyip kategori altına istediği kadar not ekleyebilir.
 
-A few resources to get you started if this is your first Flutter project:
+Eklediği notları öncelik derecesine göre sıralayıp liste başına alabilir.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## :rocket: Technologies ##
+
+The following tools were used in this project:
+
+- [Flutter](https://flutter.dev/)
+- [Dart](https://dart.dev/)
+- [Android Studio](https://developer.android.com/studio?gclid=Cj0KCQiAyJOBBhDCARIsAJG2h5eL8TqlTcYWCGcBIPw1fvDCI8-HFaYlvzdfH8GUd_-j9kX9SbFTTJkaAo3MEALw_wcB&gclsrc=aw.ds)
+
+
+## :white_check_mark: Requirements ##
+
+Before starting :checkered_flag:, you need to have [Git](https://git-scm.com) and [Flutter](https://flutter.dev/) installed.
+
+```bash
+# Clone this project
+$ git clone https://github.com/ferhatiltas/Notes-App.git
+
+# Access
+$ cd Notes-App
+
+# Pull dependencies
+$ flutter pub get
+
+# Run the project (emulator or physical device needs to be connected first)
+$ flutter run
+
+# Build an apk
+$ flutter build apk --split-per-abi
+```
+

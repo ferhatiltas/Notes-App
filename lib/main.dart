@@ -1,23 +1,26 @@
+import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:note_basket/kategoriler.dart';
-import 'package:note_basket/models/notlar.dart';
 import 'package:note_basket/utils/database_helper.dart';
 
+import 'kategoriler.dart';
 import 'models/kategori.dart';
+import 'models/notlar.dart';
 import 'not_detay.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Note Basket",
+      title: 'Not Sepeti',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.pink),
+      theme: ThemeData(
+          fontFamily: 'Raleway',
+          primarySwatch: Colors.purple,
+          accentColor: Colors.orange),
       home: NotListesi(),
     );
   }
@@ -32,35 +35,53 @@ class NotListesi extends StatelessWidget {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Center(
-          child: Text("Not Sepeti"),
+        elevation: 0,
+        title: Text(
+          "Not Sepeti",
+          style: TextStyle(fontFamily: "Raleway", fontWeight: FontWeight.w700),
         ),
-        actions: [
-          PopupMenuButton(itemBuilder: (context){
-            return [            PopupMenuItem(child:ListTile(leading: Icon(Icons.category),title: Text("Kategoriler"),onTap:()=> _kategoriSayfasi(context),) ,)
-            ];
-          })
+        actions: <Widget>[
+          PopupMenuButton(
+            itemBuilder: (context) {
+              return [
+                PopupMenuItem(
+                  child: ListTile(
+                    leading: Icon(Icons.import_contacts, color: Colors.orange,),
+                    title: Text("Kategoriler", style: TextStyle(color: Colors.blueGrey, fontWeight: FontWeight.w700),),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _kategorilerSayfasinaGit(context);
+                    },
+                  ),
+                ),
+              ];
+            },
+          ),
         ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
-        children: [
+        children: <Widget>[
           FloatingActionButton(
             onPressed: () {
               kategoriEkleDialog(context);
             },
             heroTag: "KategoriEkle",
-            tooltip: "Kategori EKle",
-            child: Icon(Icons.category_outlined),
+            tooltip: "Kategori Ekle",
+            child: Icon(
+              Icons.import_contacts,
+              color: Colors.white,
+            ),
             mini: true,
           ),
           FloatingActionButton(
-            onPressed: () {
-              detaysSayfasinaGit(context);
-            },
-            heroTag: "NotEkle",
             tooltip: "Not Ekle",
-            child: Icon(Icons.note_add_sharp),
+            heroTag: "NotEkle",
+            onPressed: () => _detaySayfasinaGit(context),
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
           ),
         ],
       ),
@@ -71,6 +92,7 @@ class NotListesi extends StatelessWidget {
   void kategoriEkleDialog(BuildContext context) {
     var formKey = GlobalKey<FormState>();
     String yeniKategoriAdi;
+
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -78,47 +100,57 @@ class NotListesi extends StatelessWidget {
           return SimpleDialog(
             title: Text(
               "Kategori Ekle",
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(
+                  fontFamily: "Raleway",
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blueGrey),
             ),
-            children: [
+            children: <Widget>[
               Form(
-                  key: formKey,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextFormField(
-                      onSaved: (yeniDeger) {
-                        yeniKategoriAdi = yeniDeger;
-                      },
-                      decoration: InputDecoration(
-                          labelText: "Kategori Adı",
-                          border: OutlineInputBorder()),
-                      validator: (girilenKategoriAdi) {
-                        if (girilenKategoriAdi.length < 3) {
-                          return "En az 3 karakter giriniz.";
-                        } else {
-                          return null;
-                        }
-                      },
+                key: formKey,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    onSaved: (yeniDeger) {
+                      yeniKategoriAdi = yeniDeger;
+                    },
+                    decoration: InputDecoration(
+                      labelText: "Kategori Adı",
+                      border: OutlineInputBorder(),
                     ),
-                  )),
+                    validator: (girilenKategoriAdi) {
+                      if (girilenKategoriAdi.length < 3) {
+                        return "En az 3 karakter giriniz";
+                      }
+                    },
+                  ),
+                ),
+              ),
               ButtonBar(
-                children: [
-                  RaisedButton(
+                children: <Widget>[
+                  OutlineButton(
+                    borderSide:
+                    BorderSide(color: Theme.of(context).primaryColor),
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    color: Colors.deepPurpleAccent,
+                    color: Colors.orangeAccent,
                     child: Text(
                       "Vazgeç",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700),
                     ),
                   ),
-                  RaisedButton(
+                  OutlineButton(
+                    borderSide:
+                    BorderSide(color: Theme.of(context).accentColor),
                     onPressed: () {
                       if (formKey.currentState.validate()) {
                         formKey.currentState.save();
                         databaseHelper
-                            .kategorliEkle(Kategori(yeniKategoriAdi))
+                            .kategoriEkle(Kategori(yeniKategoriAdi))
                             .then((kategoriID) {
                           if (kategoriID > 0) {
                             _scaffoldKey.currentState.showSnackBar(
@@ -132,10 +164,13 @@ class NotListesi extends StatelessWidget {
                         });
                       }
                     },
-                    color: Colors.deepPurpleAccent,
+                    color: Colors.redAccent,
                     child: Text(
-                      "Keydet",
-                      style: TextStyle(color: Colors.white),
+                      "Kaydet",
+                      style: TextStyle(
+                          color: Theme.of(context).accentColor,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700),
                     ),
                   ),
                 ],
@@ -145,16 +180,19 @@ class NotListesi extends StatelessWidget {
         });
   }
 
-  void detaysSayfasinaGit(BuildContext context) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => NotDetay(baslik: "Yeni Not")));
+  _detaySayfasinaGit(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NotDetay(
+              baslik: "Yeni Not",
+            )));
   }
 
-  _kategoriSayfasi(BuildContext context) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Kategoriler()));
+  void _kategorilerSayfasinaGit(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => Kategoriler()));
   }
-
-
 }
 
 class Notlar extends StatefulWidget {
@@ -168,7 +206,6 @@ class _NotlarState extends State<Notlar> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     tumNotlar = List<Not>();
     databaseHelper = DatabaseHelper();
@@ -176,82 +213,201 @@ class _NotlarState extends State<Notlar> {
 
   @override
   Widget build(BuildContext context) {
+    TextStyle textStyleBaslik = Theme.of(context).textTheme.body1.copyWith(
+        fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway');
+
     return FutureBuilder(
-        future: databaseHelper.notListesiniGetir(),
-        builder: (context, AsyncSnapshot<List<Not>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            tumNotlar = snapshot.data;
-            return ListView.builder(
-                itemCount: tumNotlar.length,
-                itemBuilder: (context, index) {
-                  return ExpansionTile(leading: _oncelikIconuAta(tumNotlar[index].notOncelik),
-                    backgroundColor: Colors.white10,title: Text(tumNotlar[index].notBaslik,style: TextStyle(fontSize: 20),),
-                  children: [
-                    Container(padding: EdgeInsets.all(5),
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Padding(padding: const EdgeInsets.all(8.0),child: Text("Kategori : ",style: TextStyle(color: Colors.black54,fontSize: 20),),),
-                            Padding(padding: const EdgeInsets.all(8.0),child: Text(tumNotlar[index].kategoriBaslik,style: TextStyle(color: Colors.black,fontSize: 20),),),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Padding(padding: const EdgeInsets.all(8.0),child: Text("Oluşturulma Tarihi : ",style: TextStyle(color: Colors.black54,fontSize: 20),),),
-                            Padding(padding: const EdgeInsets.all(8.0),child: Text(databaseHelper.dateFormat(DateTime.parse(tumNotlar[index].notTarih)),style: TextStyle(color: Colors.black,fontSize: 20),),),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text("İçerik : \n "+tumNotlar[index].notIcerik,style: TextStyle(fontSize: 20),),
-                        ),
-                        ButtonBar(
-                          alignment: MainAxisAlignment.center,
-                          children: [
-                            FlatButton(onPressed: () => _notSil(tumNotlar[index].notID), child: Text("SİL"),color: Colors.red,),
-                            FlatButton(onPressed: () =>detaysSayfasinaGit(context, tumNotlar[index]), child: Text("Güncelle"),color: Colors.green,),
-                          ],
-                        )
-
-                      ],),
-                    )
-                  ],);
-                });
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        });
+      future: databaseHelper.notListesiniGetir(),
+      builder: (context, AsyncSnapshot<List<Not>> snapShot) {
+        if (snapShot.connectionState == ConnectionState.done) {
+          tumNotlar = snapShot.data;
+          sleep(Duration(milliseconds: 500));
+          return ListView.builder(
+              itemCount: tumNotlar.length,
+              itemBuilder: (context, index) {
+                return ExpansionTile(
+                  leading: _oncelikIconuAta(tumNotlar[index].notOncelik),
+                  title: Text(
+                    tumNotlar[index].notBaslik,
+                    style: textStyleBaslik,
+                  ),
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.all(4),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Kategori",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  tumNotlar[index].kategoriBaslik,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 20,
+                                      color: Theme.of(context).accentColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Oluşturulma Tarihi",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  databaseHelper.dateFormat(DateTime.parse(
+                                      tumNotlar[index].notTarih)),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 20,
+                                      color: Theme.of(context).accentColor),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            children: <Widget>[
+                              Container(
+                                child: Text(
+                                  "İçerik",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 14),
+                                child: Text(
+                                  tumNotlar[index].notIcerik,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 20,
+                                      color: Colors.blueGrey),
+                                ),
+                              ),
+                            ],
+                          ),
+                          ButtonBar(
+                            alignment: MainAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              OutlineButton(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).primaryColor),
+                                  onPressed: () =>
+                                      _notSil(tumNotlar[index].notID),
+                                  child: Text(
+                                    "SİL",
+                                    style: TextStyle(
+                                        color: Theme.of(context).primaryColor,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700),
+                                  )),
+                              OutlineButton(
+                                  borderSide: BorderSide(
+                                      color: Theme.of(context).accentColor),
+                                  onPressed: () {
+                                    _detaySayfasinaGit(
+                                        context, tumNotlar[index]);
+                                  },
+                                  child: Text(
+                                    "GÜNCELLE",
+                                    style: TextStyle(
+                                        color: Theme.of(context).accentColor,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700),
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              });
+        } else {
+          return Center(child: Text("Yükleniyor..."));
+        }
+      },
+    );
   }
 
-
-  void detaysSayfasinaGit(BuildContext context, Not not) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => NotDetay(baslik: "Notu Düzenle", duzenlenecekNot:not)));
+  _detaySayfasinaGit(BuildContext context, Not not) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => NotDetay(
+              baslik: "Notu Düzenle",
+              duzenlenecekNot: not,
+            )));
   }
+
   _oncelikIconuAta(int notOncelik) {
-    switch(notOncelik){
-
+    switch (notOncelik) {
       case 0:
-        return CircleAvatar(child: Text("AZ",style: TextStyle(color: Colors.white),),backgroundColor: Colors.red.shade200,);
+        return CircleAvatar(
+            radius: 26,
+            child: Text(
+              "AZ",
+              style: TextStyle(
+                  color: Colors.deepOrange.shade200,
+                  fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.blueGrey.shade200);
         break;
       case 1:
-        return CircleAvatar(child: Text("ORTA",style: TextStyle(color: Colors.white),),backgroundColor: Colors.red.shade600,);
-        break;
+        return CircleAvatar(
+            radius: 26,
+            child: Text(
+              "ORTA",
+              style: TextStyle(
+                  color: Colors.deepOrange.shade400,
+                  fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.blueGrey.shade200);
       case 2:
-        return CircleAvatar(child: Text("ACİL",style: TextStyle(color: Colors.white),),backgroundColor: Colors.red.shade900,);
+        return CircleAvatar(
+            radius: 26,
+            child: Text(
+              "ACIL",
+              style: TextStyle(
+                  color: Colors.deepOrange.shade700,
+                  fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: Colors.blueGrey.shade200);
         break;
     }
   }
 
   _notSil(int notID) {
-    databaseHelper.notSil(notID).then((silinenID){
-      if(silinenID !=0){
-        Scaffold.of(context).showSnackBar(SnackBar(content: Text("Not Silindi....")));
-        setState(() {
+    databaseHelper.notSil(notID).then((silinenID) {
+      if (silinenID != 0) {
+        Scaffold.of(context)
+            .showSnackBar(SnackBar(content: Text("Not Silindi")));
 
-        });
+        setState(() {});
       }
     });
   }

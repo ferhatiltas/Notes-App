@@ -51,6 +51,18 @@ flutter:
     - assets/notlar.db
   #   - images/a_dot_ham.jpeg
 
+  fonts:
+    - family: Raleway
+      fonts:
+        - asset: assets/Raleway-Regular.ttf
+        - asset: assets/Raleway-Bold.ttf
+          weight: 700
+    - family: Genel
+      fonts:
+        - asset: assets/Ubuntu-Regular.ttf
+        - asset: assets/Ubuntu-Bold.ttf
+          weight: 700
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
